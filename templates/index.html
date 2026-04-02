@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rock · Paper · Scissors</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <!-- CRT scanline overlay -->
+  <div class="crt-overlay" aria-hidden="true"></div>
+
+  <!-- Corner bracket decorations -->
+  <div class="corner corner--tl" aria-hidden="true"></div>
+  <div class="corner corner--tr" aria-hidden="true"></div>
+  <div class="corner corner--bl" aria-hidden="true"></div>
+  <div class="corner corner--br" aria-hidden="true"></div>
+
+  <div class="game-wrap">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar__fighter topbar__fighter--player">
+        <span class="fighter-name">YOU</span>
+        <div class="health-bar">
+          <div class="health-fill health-fill--player" style="width: {{ [((5 - bot) / 5 * 100)|int, 0]|max }}%"></div>
+        </div>
+        <span class="fighter-score">{{ me }}</span>
+      </div>
+
+      <div class="topbar__center">
+        <span class="vs-badge">VS</span>
+        <p class="round-label">FIRST TO 5</p>
+      </div>
+
+      <div class="topbar__fighter topbar__fighter--bot">
+        <span class="fighter-score">{{ bot }}</span>
+        <div class="health-bar">
+          <div class="health-fill health-fill--bot" style="width: {{ [((5 - me) / 5 * 100)|int, 0]|max }}%"></div>
+        </div>
+        <span class="fighter-name">BOT</span>
+      </div>
+    </header>
+
+    <!-- ARENA -->
+    <section class="arena" aria-label="Battle arena">
+
+      <div class="result-zone" aria-live="polite">
+        {% if result %}
+          <p class="result-text">{{ result }}</p>
+          {% if bot_move %}
+          <p class="result-sub">Bot threw <strong>{{ bot_move | upper }}</strong></p>
+          {% endif %}
+        {% else %}
+          <p class="result-text result-text--idle">READY?</p>
+          <p class="result-sub">Pick a move below</p>
+        {% endif %}
+      </div>
+
+      <div class="arena-stage">
+
+        <!-- Player hand -->
+        <div class="fighter-pod fighter-pod--player">
+          <div class="hand-ring hand-ring--player">
+            {% if user_move | default('') == 'rock' %}
+              <span class="hand-emoji" data-move="rock">✊</span>
+            {% elif user_move | default('') == 'paper' %}
+              <span class="hand-emoji" data-move="paper">✋</span>
+            {% elif user_move | default('') == 'scissor' %}
+              <span class="hand-emoji" data-move="scissor">✌️</span>
+            {% else %}
+              <span class="hand-emoji hand-emoji--waiting" data-move="none">✊</span>
+            {% endif %}
+          </div>
+          <span class="pod-label">PLAYER</span>
+        </div>
+
+        <!-- Clash zone -->
+        <div class="clash-zone" aria-hidden="true">
+          <div class="clash-ring"></div>
+          <span class="clash-bolt {% if not bot_move %}clash-bolt--idle{% endif %}">
+            {% if bot_move %}⚡{% else %}◆{% endif %}
+          </span>
+        </div>
+
+        <!-- Bot hand -->
+        <div class="fighter-pod fighter-pod--bot">
+          <div class="hand-ring hand-ring--bot">
+            {% if bot_move == 'rock' %}
+              <span class="hand-emoji hand-emoji--bot" data-move="rock">✊</span>
+            {% elif bot_move == 'paper' %}
+              <span class="hand-emoji hand-emoji--bot" data-move="paper">✋</span>
+            {% elif bot_move == 'scissor' %}
+              <span class="hand-emoji hand-emoji--bot" data-move="scissor">✌️</span>
+            {% else %}
+              <span class="hand-emoji hand-emoji--bot hand-emoji--waiting" data-move="none">✊</span>
+            {% endif %}
+          </div>
+          <span class="pod-label">BOT</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MOVE BUTTONS -->
+    <section class="move-section" aria-label="Choose your move">
+      <form method="POST" action="/">
+        <div class="move-pad">
+
+          <button class="move-btn" type="submit" name="move" value="rock" aria-label="Play Rock">
+            <span class="move-btn__icon">✊</span>
+            <span class="move-btn__key">[ R ]</span>
+            <span class="move-btn__label">ROCK</span>
+          </button>
+
+          <button class="move-btn move-btn--center" type="submit" name="move" value="paper" aria-label="Play Paper">
+            <span class="move-btn__icon">✋</span>
+            <span class="move-btn__key">[ P ]</span>
+            <span class="move-btn__label">PAPER</span>
+          </button>
+
+          <button class="move-btn" type="submit" name="move" value="scissor" aria-label="Play Scissors">
+            <span class="move-btn__icon">✌️</span>
+            <span class="move-btn__key">[ S ]</span>
+            <span class="move-btn__label">SCISSORS</span>
+          </button>
+
+        </div>
+      </form>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="game-footer">
+      <span>BUILT WITH FLASK</span>
+      <span class="footer-dot">◆</span>
+      <span>INSERT COIN TO CONTINUE</span>
+    </footer>
+
+  </div>
+
+  <!-- script src="{{ url_for('static', filename='main.js') }}" defer></script -->
+
+</body>
+</html>
